@@ -1,52 +1,62 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import { createNetworkConfig, SuiClientProvider, WalletProvider as SuiWalletProvider } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui/client';
-import Header from './components/Header';
-import AllowlistManager from './components/AllowlistManager';
-import SubscriptionManager from './components/SubscriptionManager';
-import HomePage from './pages/HomePage';
-import Footer from './components/Footer';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletProvider } from './contexts/WalletContext';
-import { SealProvider } from './contexts/SealContext';
-
-// Import Sui dApp Kit CSS
+import ConnectWallet from './components/ConnectWallet';
 import '@mysten/dapp-kit/dist/index.css';
+import './wallet-modal.css';
 
-// Create network config for Sui
+// Create network configuration
 const { networkConfig } = createNetworkConfig({
-  testnet: { url: getFullnodeUrl('testnet') },
   mainnet: { url: getFullnodeUrl('mainnet') },
+  testnet: { url: getFullnodeUrl('testnet') },
 });
 
-// Create query client for React Query
+// Create query client
 const queryClient = new QueryClient();
 
 const App = () => {
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
+  
+  const toggleWalletModal = () => {
+    setShowWalletModal(!showWalletModal);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-        <SuiWalletProvider autoConnect={false}>
-          <Router>
-            <WalletProvider>
-              <SealProvider>
-                <div className="app">
-                  <Header />
-                  <main className="main-content">
-                    <div className="container">
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/allowlist" element={<AllowlistManager />} />
-                        <Route path="/subscription" element={<SubscriptionManager />} />
-                      </Routes>
-                    </div>
-                  </main>
-                  <Footer />
+      <SuiClientProvider networks={networkConfig} defaultNetwork={selectedNetwork}>
+        <SuiWalletProvider>
+          <WalletProvider>
+            <div className="app">
+              <header className="header">
+                <h1>Sui dApp Example</h1>
+                <div className="header-actions">
+                  <select 
+                    value={selectedNetwork}
+                    onChange={(e) => setSelectedNetwork(e.target.value)}
+                    className="network-selector"
+                  >
+                    <option value="mainnet">Mainnet</option>
+                    <option value="testnet">Testnet</option>
+                  </select>
+                  <button className="connect-button" onClick={toggleWalletModal}>
+                    Connect Wallet
+                  </button>
                 </div>
-              </SealProvider>
-            </WalletProvider>
-          </Router>
+              </header>
+              
+              <main className="main-content">
+                <h2>Welcome to Your Sui dApp</h2>
+                <p>Connect your wallet to get started.</p>
+              </main>
+              
+              {showWalletModal && (
+                <ConnectWallet onClose={() => setShowWalletModal(false)} />
+              )}
+            </div>
+          </WalletProvider>
         </SuiWalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
