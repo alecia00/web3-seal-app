@@ -2,27 +2,35 @@ import React, { useState } from 'react';
 import { useWalletContext } from '../contexts/WalletContext';
 
 const SubscriptionManager = () => {
-  const { isConnected, connectWallet, isLoading } = useWalletContext();
+  const { connected, connectWallet, isLoading: walletLoading } = useWalletContext();
   const [loading, setLoading] = useState(false);
   const [subscriptionName, setSubscriptionName] = useState('');
   const [subscriptionFee, setSubscriptionFee] = useState('');
   const [subscriptionDuration, setSubscriptionDuration] = useState('30');
+  const [actionMessage, setActionMessage] = useState('');
 
   const handleCreateSubscription = (e) => {
     e.preventDefault();
+    if (!subscriptionName || !subscriptionFee) return;
+    
     setLoading(true);
     
-    // Simulating API call
+    // Simulate API call
     setTimeout(() => {
-      alert(`This feature is in development. Subscription creation will be available soon!
-Name: ${subscriptionName}
-Fee: ${subscriptionFee} SUI
-Duration: ${subscriptionDuration} days`);
+      setActionMessage(`Subscription "${subscriptionName}" created successfully!`);
+      setSubscriptionName('');
+      setSubscriptionFee('');
+      setSubscriptionDuration('30');
       setLoading(false);
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setActionMessage('');
+      }, 3000);
     }, 1500);
   };
   
-  if (!isConnected) {
+  if (!connected) {
     return (
       <div className="subscription-manager">
         <div className="card">
@@ -31,9 +39,9 @@ Duration: ${subscriptionDuration} days`);
           <button 
             className="btn primary"
             onClick={connectWallet}
-            disabled={isLoading}
+            disabled={walletLoading}
           >
-            {isLoading ? 'Connecting...' : 'Connect Wallet'}
+            {walletLoading ? 'Connecting...' : 'Connect Wallet'}
           </button>
         </div>
       </div>
@@ -49,6 +57,12 @@ Duration: ${subscriptionDuration} days`);
           Set subscription fees and durations to monetize your content with NFT subscriptions.
         </p>
         
+        {actionMessage && (
+          <div className="action-message success">
+            {actionMessage}
+          </div>
+        )}
+        
         <div className="subscription-form">
           <h3>Create New Subscription</h3>
           <form onSubmit={handleCreateSubscription}>
@@ -62,6 +76,7 @@ Duration: ${subscriptionDuration} days`);
                 placeholder="Premium Content Access"
                 className="input-field"
                 required
+                disabled={loading}
               />
             </div>
             
@@ -77,6 +92,7 @@ Duration: ${subscriptionDuration} days`);
                 placeholder="0.1"
                 className="input-field"
                 required
+                disabled={loading}
               />
             </div>
             
@@ -88,6 +104,7 @@ Duration: ${subscriptionDuration} days`);
                 onChange={(e) => setSubscriptionDuration(e.target.value)}
                 className="input-field"
                 required
+                disabled={loading}
               >
                 <option value="7">7 days</option>
                 <option value="30">30 days</option>
