@@ -1,9 +1,10 @@
 [package]
-name = "seal_allowlist"
+name = "seal"
 version = "0.1.0"
+published-at = "0x0" # This will be set after publishing the package
 
 [dependencies]
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
 
 [addresses]
-seal = "0x0"
+seal = "0x0" # This will be your package address after publishing
