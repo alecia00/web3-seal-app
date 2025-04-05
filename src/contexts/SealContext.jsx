@@ -1,27 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useWalletContext } from './WalletContext';
-import sealService from '../services/sealService';
 
 const SealContext = createContext(null);
 
 export const SealProvider = ({ children }) => {
-  const { wallet, address, isConnected, suiClient } = useWalletContext();
+  const { wallet, address, isConnected } = useWalletContext();
   const [allowlists, setAllowlists] = useState([]);
   const [currentAllowlist, setCurrentAllowlist] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [lastTransaction, setLastTransaction] = useState(null);
-
-  // Load allowlists when wallet connects
-  useEffect(() => {
-    if (isConnected && address) {
-      fetchAllowlists();
-    } else {
-      setAllowlists([]);
-      setCurrentAllowlist(null);
-    }
-  }, [isConnected, address]);
 
   const fetchAllowlists = async () => {
     if (!isConnected || !address) {
@@ -33,15 +22,33 @@ export const SealProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const lists = await sealService.getAllowlists(address, suiClient);
-      setAllowlists(lists);
-      return lists;
+      // For demo, simulate API call
+      setTimeout(() => {
+        const mockAllowlists = [
+          {
+            id: "0x" + Math.random().toString(16).substring(2, 42),
+            name: "Premium Content",
+            members: ["0x1234...5678", "0x8765...4321"],
+            owner: address
+          },
+          {
+            id: "0x" + Math.random().toString(16).substring(2, 42),
+            name: "VIP Access",
+            members: [],
+            owner: address
+          }
+        ];
+        
+        setAllowlists(mockAllowlists);
+        setLoading(false);
+      }, 1000);
+      
+      return [];
     } catch (error) {
       console.error('Error fetching allowlists:', error);
       setError('Failed to fetch allowlists: ' + error.message);
-      return [];
-    } finally {
       setLoading(false);
+      return [];
     }
   };
 
@@ -56,28 +63,34 @@ export const SealProvider = ({ children }) => {
       setTransactionInProgress(true);
       setError(null);
 
-      const result = await sealService.createAllowlist(wallet, name, suiClient);
-      
-      if (result.success) {
-        setLastTransaction({
-          type: 'create',
-          id: result.txId,
-          timestamp: Date.now()
-        });
-        
-        // Refresh the allowlists
-        await fetchAllowlists();
-        return true;
-      } else {
-        throw new Error('Transaction failed');
-      }
+      // Simulate transaction
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const newAllowlist = {
+            id: "0x" + Math.random().toString(16).substring(2, 42),
+            name,
+            members: [],
+            owner: address
+          };
+          
+          setAllowlists([...allowlists, newAllowlist]);
+          setLastTransaction({
+            type: 'create',
+            id: "0x" + Math.random().toString(16).substring(2, 42),
+            timestamp: Date.now()
+          });
+          
+          setLoading(false);
+          setTransactionInProgress(false);
+          resolve(true);
+        }, 2000);
+      });
     } catch (error) {
       console.error('Error creating allowlist:', error);
       setError('Failed to create allowlist: ' + error.message);
-      return false;
-    } finally {
       setLoading(false);
       setTransactionInProgress(false);
+      return false;
     }
   };
 
@@ -92,86 +105,36 @@ export const SealProvider = ({ children }) => {
       setTransactionInProgress(true);
       setError(null);
 
-      const result = await sealService.addMemberToAllowlist(
-        wallet, 
-        allowlistId, 
-        memberAddress,
-        suiClient
-      );
-      
-      if (result.success) {
-        setLastTransaction({
-          type: 'addMember',
-          id: result.txId,
-          timestamp: Date.now()
-        });
-        
-        // Refresh the allowlists
-        await fetchAllowlists();
-        return true;
-      } else {
-        throw new Error('Transaction failed');
-      }
+      // Simulate transaction
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const updatedAllowlists = allowlists.map(list => {
+            if (list.id === allowlistId) {
+              return {
+                ...list,
+                members: [...list.members, memberAddress]
+              };
+            }
+            return list;
+          });
+          
+          setAllowlists(updatedAllowlists);
+          setLastTransaction({
+            type: 'addMember',
+            id: "0x" + Math.random().toString(16).substring(2, 42),
+            timestamp: Date.now()
+          });
+          
+          setLoading(false);
+          setTransactionInProgress(false);
+          resolve(true);
+        }, 2000);
+      });
     } catch (error) {
-      console.error('Error adding member to allowlist:', error);
+      console.error('Error adding member:', error);
       setError('Failed to add member: ' + error.message);
-      return false;
-    } finally {
       setLoading(false);
       setTransactionInProgress(false);
-    }
-  };
-
-  const removeMemberFromAllowlist = async (allowlistId, memberAddress) => {
-    if (!isConnected || !wallet) {
-      setError('Wallet not connected');
-      return false;
-    }
-
-    try {
-      setLoading(true);
-      setTransactionInProgress(true);
-      setError(null);
-
-      const result = await sealService.removeMemberFromAllowlist(
-        wallet, 
-        allowlistId, 
-        memberAddress,
-        suiClient
-      );
-      
-      if (result.success) {
-        setLastTransaction({
-          type: 'removeMember',
-          id: result.txId,
-          timestamp: Date.now()
-        });
-        
-        // Refresh the allowlists
-        await fetchAllowlists();
-        return true;
-      } else {
-        throw new Error('Transaction failed');
-      }
-    } catch (error) {
-      console.error('Error removing member from allowlist:', error);
-      setError('Failed to remove member: ' + error.message);
-      return false;
-    } finally {
-      setLoading(false);
-      setTransactionInProgress(false);
-    }
-  };
-
-  const checkMembership = async (allowlistId, memberAddress) => {
-    try {
-      return await sealService.isMemberOfAllowlist(
-        allowlistId, 
-        memberAddress,
-        suiClient
-      );
-    } catch (error) {
-      console.error('Error checking membership:', error);
       return false;
     }
   };
@@ -188,8 +151,6 @@ export const SealProvider = ({ children }) => {
         createAllowlist,
         fetchAllowlists,
         addMemberToAllowlist,
-        removeMemberFromAllowlist,
-        checkMembership,
         setCurrentAllowlist,
       }}
     >
