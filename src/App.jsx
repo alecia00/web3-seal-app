@@ -4,7 +4,7 @@ import { WalletProvider } from './contexts/WalletContext';
 import Header from './components/Header';
 import AllowlistManager from './components/AllowlistManager';
 import SubscriptionManager from './components/SubscriptionManager';
-import HomePage from './components/HomePage'; // Ubah jalur ini jika HomePage.js Anda berada di direktori pages/
+import HomePage from './pages/HomePage'; // Ubah jalur ini jika HomePage.js Anda berada di direktori pages/
 import Footer from './components/Footer';
 
 const App = () => {
