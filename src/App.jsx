@@ -106,27 +106,28 @@ const AppContent = () => {
 };
 
 // Main App component with providers
-function App() {
+const App = () => {
   return (
     <Router>
       <WalletProvider>
         <SealProvider>
-          <Routes>
-            <Route path="/" element={<AppContent />} />
-            <Route path="/faucet" element={<FaucetPage />} />
-            <Route path="/home" element={<HomePage />} />
-            {/* Tambahkan route lain sesuai kebutuhan */}
-          </Routes>
-          <footer className="footer">
-            <p>
-              This is a demonstration of Seal's capabilities and is intended solely as a playground environment.
-              Do not connect your primary wallet or upload any sensitive content.
-            </p>
-          </footer>
+          <div className="app">
+            <Header />
+            <main className="main-content">
+              <div className="container">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/allowlist" element={<AllowlistManager />} />
+                  <Route path="/subscription" element={<SubscriptionManager />} />
+                </Routes>
+              </div>
+            </main>
+            <Footer />
+          </div>
         </SealProvider>
       </WalletProvider>
     </Router>
   );
-}
+};
 
 export default App;
