@@ -113,11 +113,25 @@ const AppContent = () => {
 // Main App component with providers
 function App() {
   return (
-    <WalletProvider>
-      <SealProvider>
-        <AppContent />
-      </SealProvider>
-    </WalletProvider>
+    <Router>
+      <WalletProvider>
+        <SealProvider>
+          <div className="app-container">
+            <Header />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/faucet" element={<FaucetPage />} />
+                {/* Tambahkan route lain sesuai kebutuhan */}
+              </Routes>
+            </main>
+            <footer className="footer">
+              <p>© 2025 Seal App - Powered by SUI Network</p>
+            </footer>
+          </div>
+        </SealProvider>
+      </WalletProvider>
+    </Router>
   );
 }
 
