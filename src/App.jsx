@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import ConnectWallet from './components/ConnectWallet';
 import ContentUpload from './components/ContentUpload';
@@ -8,6 +9,8 @@ import ContentViewer from './components/ContentViewer';
 import { WalletProvider } from './contexts/WalletContext';
 import { SealProvider } from './contexts/SealContext';
 import { useWallet } from './contexts/WalletContext';
+import HomePage from './pages/HomePage';
+import FaucetPage from './pages/FaucetPage';
 import './styles/globals.css';
 
 // Wrapped app component that has access to wallet context
@@ -116,19 +119,12 @@ function App() {
     <Router>
       <WalletProvider>
         <SealProvider>
-          <div className="app-container">
-            <Header />
-            <main className="main-content">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/faucet" element={<FaucetPage />} />
-                {/* Tambahkan route lain sesuai kebutuhan */}
-              </Routes>
-            </main>
-            <footer className="footer">
-              <p>© 2025 Seal App - Powered by SUI Network</p>
-            </footer>
-          </div>
+          <Routes>
+            <Route path="/" element={<AppContent />} />
+            <Route path="/faucet" element={<FaucetPage />} />
+            <Route path="/home" element={<HomePage />} />
+            {/* Tambahkan route lain sesuai kebutuhan */}
+          </Routes>
         </SealProvider>
       </WalletProvider>
     </Router>
