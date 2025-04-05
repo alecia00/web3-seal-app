@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import ConnectWallet from './components/ConnectWallet';
@@ -6,7 +6,7 @@ import ContentUpload from './components/ContentUpload';
 import AllowlistManager from './components/AllowlistManager';
 import SubscriptionManager from './components/SubscriptionManager';
 import ContentViewer from './components/ContentViewer';
-import { WalletProvider, WalletContext } from './contexts/WalletContext';
+import { WalletProvider, useWallet } from './contexts/WalletContext';
 import { SealProvider } from './contexts/SealContext';
 import HomePage from './pages/HomePage';
 import FaucetPage from './pages/FaucetPage';
@@ -21,7 +21,7 @@ const AppContent = () => {
   const [currentTab, setCurrentTab] = useState('allowlist');
   
   // Get wallet context
-  const { isConnected } = useContext(WalletContext);
+  const { isConnected } = useWallet();
   
   // Function to open wallet modal
   const handleConnectWalletClick = () => {
@@ -101,13 +101,6 @@ const AppContent = () => {
           onClose={closeWalletModal}
         />
       )}
-      
-      <footer className="footer">
-        <p>
-          This is a demonstration of Seal's capabilities and is intended solely as a playground environment.
-          Do not connect your primary wallet or upload any sensitive content.
-        </p>
-      </footer>
     </div>
   );
 };
@@ -124,6 +117,12 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             {/* Tambahkan route lain sesuai kebutuhan */}
           </Routes>
+          <footer className="footer">
+            <p>
+              This is a demonstration of Seal's capabilities and is intended solely as a playground environment.
+              Do not connect your primary wallet or upload any sensitive content.
+            </p>
+          </footer>
         </SealProvider>
       </WalletProvider>
     </Router>
