@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
-import { WalletContext } from '../contexts/WalletContext';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { useWallet } from '../contexts/WalletContext.jsx';
 import '../styles/home.css';
 
 const HomePage = () => {
-  const { isConnected, connectWallet } = useContext(WalletContext);
+  const { isConnected, connectWallet } = useWallet();
 
   return (
     <div className="home-container">
