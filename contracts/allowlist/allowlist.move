@@ -1,25 +1,23 @@
-/// Allowlist module for Seal protocol
-/// This module implements allowlist-based access control
 module seal::allowlist {
+    use std::string::{Self, String};
+    use std::vector;
     use sui::object::{Self, UID};
     use sui::transfer;
     use sui::tx_context::{Self, TxContext};
-    use sui::table::{Self, Table};
+    use sui::vec_set::{Self, VecSet};
     use sui::event;
-    use std::vector;
-    use std::string::{Self, String};
 
     /// Error codes
     const ENotOwner: u64 = 0;
-    const EAlreadyInAllowlist: u64 = 1;
-    const ENotInAllowlist: u64 = 2;
+    const EMemberAlreadyExists: u64 = 1;
+    const EMemberNotFound: u64 = 2;
 
-    /// Represents an allowlist with its members
+    /// The main Allowlist object that stores members
     struct Allowlist has key, store {
         id: UID,
         name: String,
         owner: address,
-        members: Table<address, bool>
+        members: VecSet<address>
     }
 
     /// Event emitted when a new allowlist is created
@@ -42,97 +40,154 @@ module seal::allowlist {
     }
 
     /// Create a new allowlist
-    public entry fun create_allowlist(
+    public entry fun create_allowlist_entry(
         name: vector<u8>,
         ctx: &mut TxContext
     ) {
-        let owner = tx_context::sender(ctx);
-        let allowlist_id = object::new(ctx);
+        let allowlist = create_allowlist(name, ctx);
+        transfer::transfer(allowlist, tx_context::sender(ctx));
+    }
+
+    /// Internal function to create an allowlist
+    fun create_allowlist(
+        name: vector<u8>,
+        ctx: &mut TxContext
+    ): Allowlist {
         let name_string = string::utf8(name);
+        let owner = tx_context::sender(ctx);
+        let id = object::new(ctx);
+        let allowlist_id = object::uid_to_address(&id);
         
-        // Create a new table for members
-        let members = table::new<address, bool>(ctx);
+        // Create empty members set
+        let members = vec_set::empty();
         
-        // Add owner as the first member
-        table::add(&mut members, owner, true);
-        
-        // Create the allowlist object
-        let allowlist = Allowlist {
-            id: allowlist_id,
-            name: name_string,
-            owner,
-            members
-        };
-        
-        // Emit the creation event
+        // Emit creation event
         event::emit(AllowlistCreated {
-            allowlist_id: object::uid_to_address(&allowlist.id),
+            allowlist_id,
             name: name_string,
             owner
         });
         
-        // Transfer the allowlist to the owner
-        transfer::share_object(allowlist);
+        Allowlist {
+            id,
+            name: name_string,
+            owner,
+            members
+        }
     }
 
-    /// Add a member to an allowlist
+    /// Add a member to the allowlist
     public entry fun add_member(
         allowlist: &mut Allowlist,
         member: address,
-        ctx: &mut TxContext
+        ctx: &TxContext
     ) {
-        // Only the owner can add members
-        let sender = tx_context::sender(ctx);
-        assert!(sender == allowlist.owner, ENotOwner);
+        // Only owner can add members
+        assert!(tx_context::sender(ctx) == allowlist.owner, ENotOwner);
         
-        // Check if member is already in the allowlist
-        assert!(!table::contains(&allowlist.members, member), EAlreadyInAllowlist);
+        // Check if member already exists
+        assert!(!vec_set::contains(&allowlist.members, &member), EMemberAlreadyExists);
         
-        // Add member to the allowlist
-        table::add(&mut allowlist.members, member, true);
+        // Add the member
+        vec_set::insert(&mut allowlist.members, member);
         
-        // Emit the member added event
+        // Emit event
         event::emit(MemberAdded {
             allowlist_id: object::uid_to_address(&allowlist.id),
             member
         });
     }
 
-    /// Remove a member from an allowlist
+    /// Remove a member from the allowlist
     public entry fun remove_member(
         allowlist: &mut Allowlist,
         member: address,
-        ctx: &mut TxContext
+        ctx: &TxContext
     ) {
-        // Only the owner can remove members
-        let sender = tx_context::sender(ctx);
-        assert!(sender == allowlist.owner, ENotOwner);
+        // Only owner can remove members
+        assert!(tx_context::sender(ctx) == allowlist.owner, ENotOwner);
         
-        // Check if member is in the allowlist
-        assert!(table::contains(&allowlist.members, member), ENotInAllowlist);
+        // Check if member exists
+        assert!(vec_set::contains(&allowlist.members, &member), EMemberNotFound);
         
-        // Remove member from the allowlist
-        table::remove(&mut allowlist.members, member);
+        // Remove the member
+        vec_set::remove(&mut allowlist.members, &member);
         
-        // Emit the member removed event
+        // Emit event
         event::emit(MemberRemoved {
             allowlist_id: object::uid_to_address(&allowlist.id),
             member
         });
     }
 
-    /// Check if an address is a member of an allowlist
+    /// Check if an address is a member of the allowlist
     public fun is_member(allowlist: &Allowlist, member: address): bool {
-        table::contains(&allowlist.members, member)
+        vec_set::contains(&allowlist.members, &member)
     }
 
-    /// Get the name of an allowlist
-    public fun name(allowlist: &Allowlist): String {
-        allowlist.name
+    /// Get the name of the allowlist
+    public fun name(allowlist: &Allowlist): &String {
+        &allowlist.name
     }
 
-    /// Get the owner of an allowlist
+    /// Get the owner of the allowlist
     public fun owner(allowlist: &Allowlist): address {
         allowlist.owner
+    }
+
+    /// Get the members count
+    public fun members_count(allowlist: &Allowlist): u64 {
+        vec_set::size(&allowlist.members)
+    }
+
+    #[test]
+    fun test_create_allowlist() {
+        use sui::test_scenario;
+
+        let owner = @0xCAFE;
+        let member = @0xFACE;
+
+        let scenario_val = test_scenario::begin(owner);
+        let scenario = &mut scenario_val;
+        
+        // Create an allowlist
+        test_scenario::next_tx(scenario, owner);
+        {
+            create_allowlist_entry(b"Test Allowlist", test_scenario::ctx(scenario));
+        };
+
+        // Verify allowlist was created and add a member
+        test_scenario::next_tx(scenario, owner);
+        {
+            let allowlist = test_scenario::take_from_sender<Allowlist>(scenario);
+            assert!(name(&allowlist) == &string::utf8(b"Test Allowlist"), 0);
+            assert!(owner(&allowlist) == owner, 0);
+            assert!(members_count(&allowlist) == 0, 0);
+            
+            // Add a member
+            add_member(&mut allowlist, member, test_scenario::ctx(scenario));
+            assert!(members_count(&allowlist) == 1, 0);
+            assert!(is_member(&allowlist, member), 0);
+            
+            test_scenario::return_to_sender(scenario, allowlist);
+        };
+
+        // Remove a member
+        test_scenario::next_tx(scenario, owner);
+        {
+            let allowlist = test_scenario::take_from_sender<Allowlist>(scenario);
+            
+            // Verify member exists and remove
+            assert!(is_member(&allowlist, member), 0);
+            remove_member(&mut allowlist, member, test_scenario::ctx(scenario));
+            
+            // Verify member was removed
+            assert!(members_count(&allowlist) == 0, 0);
+            assert!(!is_member(&allowlist, member), 0);
+            
+            test_scenario::return_to_sender(scenario, allowlist);
+        };
+
+        test_scenario::end(scenario_val);
     }
 }
