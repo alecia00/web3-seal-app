@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import ConnectWallet from './components/ConnectWallet';
@@ -6,9 +6,8 @@ import ContentUpload from './components/ContentUpload';
 import AllowlistManager from './components/AllowlistManager';
 import SubscriptionManager from './components/SubscriptionManager';
 import ContentViewer from './components/ContentViewer';
-import { WalletProvider } from './contexts/WalletContext';
+import { WalletProvider, WalletContext } from './contexts/WalletContext';
 import { SealProvider } from './contexts/SealContext';
-import { useWallet } from './contexts/WalletContext';
 import HomePage from './pages/HomePage';
 import FaucetPage from './pages/FaucetPage';
 import './styles/globals.css';
@@ -22,7 +21,7 @@ const AppContent = () => {
   const [currentTab, setCurrentTab] = useState('allowlist');
   
   // Get wallet context
-  const { isConnected } = useWallet();
+  const { isConnected } = useContext(WalletContext);
   
   // Function to open wallet modal
   const handleConnectWalletClick = () => {
