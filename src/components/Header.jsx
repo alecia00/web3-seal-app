@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useWalletContext } from '../contexts/WalletContext';
 
 const Header = () => {
-  const { isConnected, address, isLoading, connectWallet, disconnectWallet } = useWalletContext();
+  const { connected, address, isLoading, connectWallet, disconnectWallet } = useWalletContext();
   const location = useLocation();
 
   return (
@@ -38,10 +38,10 @@ const Header = () => {
           </nav>
           
           <div className="wallet-section">
-            {isConnected ? (
+            {connected ? (
               <div className="wallet-info">
                 <span className="wallet-address">
-                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                  {address.slice(0, 6)}...{address.slice(-4)}
                 </span>
                 <button 
                   className="btn disconnect"
