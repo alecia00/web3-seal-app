@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { useWallet } from '../contexts/WalletContext';
+import React, { useState, useEffect } from 'react';
+import { useWalletContext } from '../contexts/WalletContext';
 
 const ConnectWallet = ({ onClose }) => {
-  const { WALLET_TYPES, connectWallet, isConnecting, error } = useWallet();
+  const { WALLET_TYPES, connectWallet, isLoading, getWalletOptions } = useWalletContext();
   const [activeTab, setActiveTab] = useState('connect'); // 'connect' or 'info'
+  const [error, setError] = useState('');
+  const [walletOptions, setWalletOptions] = useState([]);
+  
+  useEffect(() => {
+    // Get available wallet options
+    setWalletOptions(getWalletOptions());
+  }, [getWalletOptions]);
 
   const handleWalletSelect = async (walletType) => {
     try {
+      setError('');
       await connectWallet(walletType);
       // Close modal on successful connection
       onClose();
     } catch (err) {
-      // Error handling is done in the wallet context
+      setError(`Failed to connect: ${err.message || 'Unknown error'}`);
       console.error('Wallet connection error:', err);
     }
   };
@@ -45,7 +53,7 @@ const ConnectWallet = ({ onClose }) => {
               <button
                 className="wallet-option"
                 onClick={() => handleWalletSelect(WALLET_TYPES.SUI)}
-                disabled={isConnecting}
+                disabled={isLoading}
               >
                 <img 
                   src="/assets/sui-wallet-logo.svg" 
@@ -58,7 +66,7 @@ const ConnectWallet = ({ onClose }) => {
               <button
                 className="wallet-option"
                 onClick={() => handleWalletSelect(WALLET_TYPES.PHANTOM)}
-                disabled={isConnecting}
+                disabled={isLoading}
               >
                 <img 
                   src="/assets/phantom-logo.svg" 
@@ -71,7 +79,7 @@ const ConnectWallet = ({ onClose }) => {
               <button
                 className="wallet-option"
                 onClick={() => handleWalletSelect(WALLET_TYPES.MARTIAN)}
-                disabled={isConnecting}
+                disabled={isLoading}
               >
                 <img 
                   src="/assets/martian-logo.svg" 
@@ -84,7 +92,7 @@ const ConnectWallet = ({ onClose }) => {
               <button
                 className="wallet-option"
                 onClick={() => handleWalletSelect(WALLET_TYPES.OKX)}
-                disabled={isConnecting}
+                disabled={isLoading}
               >
                 <img 
                   src="/assets/okx-logo.svg" 
@@ -133,7 +141,7 @@ const ConnectWallet = ({ onClose }) => {
             </div>
           )}
 
-          {isConnecting && (
+          {isLoading && (
             <div className="wallet-connecting">
               Connecting to wallet...
             </div>
