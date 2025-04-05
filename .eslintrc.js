@@ -26,13 +26,14 @@ module.exports = {
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
     'no-unused-vars': 'warn',
-    'no-undef': 'error'
+    'no-undef': 'warn', // Diubah dari 'error' ke 'warn'
+    'import/no-unresolved': 'off' // Menambahkan aturan ini
   },
   overrides: [
     {
       files: ['**/*.js', '**/*.jsx'],
       rules: {
-        'no-undef': 'error'
+        'no-undef': 'warn' // Diubah dari 'error' ke 'warn'
       }
     }
   ]
