@@ -1,7 +1,16 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
 // Membuat context
 export const WalletContext = createContext(null);
+
+// Hook untuk menggunakan WalletContext
+export const useWallet = () => {
+  const context = useContext(WalletContext);
+  if (context === null) {
+    throw new Error("useWallet must be used within a WalletProvider");
+  }
+  return context;
+};
 
 export const WalletProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -54,8 +63,6 @@ export const WalletProvider = ({ children }) => {
   }, []);
 
   // Fungsi utilitas untuk menandatangani message
-  // Dalam aplikasi SUI sebenarnya, ini akan menggunakan 
-  // fungsi dari paste-2.txt (signed_message.rs)
   const signMessage = async (message) => {
     if (!isConnected) {
       throw new Error('Wallet not connected');
