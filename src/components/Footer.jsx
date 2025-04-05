@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container">
         <div className="footer-content">
           <div className="footer-info">
-            <p>Built on the Sui Testnet using Seal Protocol</p>
+            <p>Built on Sui Testnet</p>
           </div>
           
           <div className="creator-info">
