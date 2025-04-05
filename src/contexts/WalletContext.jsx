@@ -1,108 +1,133 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useWallet } from '@mysten/dapp-kit';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useWallets, useCurrentWallet, useConnectWallet, useCurrentAccount, useDisconnectWallet } from '@mysten/dapp-kit';
 
-// Create wallet context
+// Define wallet types
+const WALLET_TYPES = {
+  SUI: 'sui',
+  PHANTOM: 'phantom',
+  MARTIAN: 'martian',
+  OKX: 'okx'
+};
+
+// Create context
 const WalletContext = createContext(null);
 
 export const WalletProvider = ({ children }) => {
-  // Use the Sui dApp Kit wallet hook
-  const { 
-    isConnected,
-    currentAccount,
-    connecting,
-    disconnect,
-    select,
-    allAvailableWallets,
-    connect
-  } = useWallet();
-
-  const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  // Update address when wallet connection changes
-  useEffect(() => {
-    if (isConnected && currentAccount) {
-      setAddress(currentAccount.address);
-    } else {
-      setAddress('');
-    }
-  }, [isConnected, currentAccount]);
-
-  // Wrapper for connecting to a wallet
-  const connectWallet = async (walletType) => {
-    try {
-      setIsLoading(true);
-      
-      // Select wallet type if provided, otherwise show wallet selector
-      if (walletType) {
-        // Find the wallet in available wallets
-        const selectedWallet = allAvailableWallets.find(
-          wallet => wallet.name.toLowerCase() === walletType.toLowerCase()
-        );
-        
-        if (selectedWallet) {
-          await select(selectedWallet.name);
-          await connect();
-        } else {
-          throw new Error(`Wallet type ${walletType} not found`);
-        }
-      } else {
-        // If no wallet type specified, open the connector UI
-        await connect();
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Wallet connection error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Wrapper for disconnecting wallet
-  const disconnectWallet = async () => {
-    try {
-      await disconnect();
-    } catch (error) {
-      console.error('Error disconnecting wallet:', error);
-    }
-  };
+  const [error, setError] = useState(null);
+  
+  const wallets = useWallets();
+  const { currentWallet, connectionStatus } = useCurrentWallet();
+  const { mutate: connectWalletMutation } = useConnectWallet();
+  const { mutate: disconnectWallet } = useDisconnectWallet();
+  const currentAccount = useCurrentAccount();
 
   // Get all available wallet options
-  const getWalletOptions = () => {
-    return allAvailableWallets.map(wallet => ({
+  const getWalletOptions = useCallback(() => {
+    return wallets.map(wallet => ({
+      id: wallet.name.toLowerCase().replace(/\s+/g, '-'),
       name: wallet.name,
       icon: wallet.icon,
-      id: wallet.name.toLowerCase()
+      type: wallet.name.toLowerCase().includes('sui') ? WALLET_TYPES.SUI :
+            wallet.name.toLowerCase().includes('phantom') ? WALLET_TYPES.PHANTOM :
+            wallet.name.toLowerCase().includes('martian') ? WALLET_TYPES.MARTIAN :
+            wallet.name.toLowerCase().includes('okx') ? WALLET_TYPES.OKX : null
     }));
-  };
+  }, [wallets]);
 
-  // Define wallet types constants
-  const WALLET_TYPES = {
-    SUI: 'sui wallet',
-    PHANTOM: 'phantom',
-    MARTIAN: 'martian sui wallet',
-    OKX: 'okx wallet'
+  // Connect to wallet
+  const connectWallet = useCallback(async (walletType) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const selectedWallet = wallets.find(wallet => {
+        const walletName = wallet.name.toLowerCase();
+        switch(walletType) {
+          case WALLET_TYPES.SUI:
+            return walletName.includes('sui') && !walletName.includes('martian');
+          case WALLET_TYPES.PHANTOM:
+            return walletName.includes('phantom');
+          case WALLET_TYPES.MARTIAN:
+            return walletName.includes('martian');
+          case WALLET_TYPES.OKX:
+            return walletName.includes('okx');
+          default:
+            return false;
+        }
+      });
+
+      if (!selectedWallet) {
+        throw new Error(`${walletType} wallet not found. Please install it first.`);
+      }
+
+      // Connect to the selected wallet
+      return new Promise((resolve, reject) => {
+        connectWalletMutation(
+          { wallet: selectedWallet },
+          {
+            onSuccess: () => {
+              setIsLoading(false);
+              resolve();
+            },
+            onError: (err) => {
+              setError(err.message || 'Failed to connect');
+              setIsLoading(false);
+              reject(err);
+            }
+          }
+        );
+      });
+    } catch (err) {
+      setError(err.message || 'Failed to connect');
+      setIsLoading(false);
+      throw err;
+    }
+  }, [wallets, connectWalletMutation]);
+
+  // Disconnect wallet
+  const disconnectWalletHandler = useCallback(() => {
+    setIsLoading(true);
+    disconnectWallet(
+      {},
+      {
+        onSuccess: () => {
+          setIsLoading(false);
+        },
+        onError: (err) => {
+          setError(err.message || 'Failed to disconnect');
+          setIsLoading(false);
+        }
+      }
+    );
+  }, [disconnectWallet]);
+
+  // Check if connected
+  const isConnected = connectionStatus === 'connected' && currentAccount;
+
+  const walletContextValue = {
+    WALLET_TYPES,
+    connectWallet,
+    disconnectWallet: disconnectWalletHandler,
+    getWalletOptions,
+    isLoading,
+    error,
+    isConnected,
+    currentWallet,
+    currentAccount
   };
 
   return (
-    <WalletContext.Provider
-      value={{
-        connected: isConnected,
-        address,
-        isLoading: isLoading || connecting,
-        connectWallet,
-        disconnectWallet,
-        getWalletOptions,
-        WALLET_TYPES
-      }}
-    >
+    <WalletContext.Provider value={walletContextValue}>
       {children}
     </WalletContext.Provider>
   );
 };
 
-export const useWalletContext = () => useContext(WalletContext);
-
-export default WalletContext;
+export const useWalletContext = () => {
+  const context = useContext(WalletContext);
+  if (!context) {
+    throw new Error('useWalletContext must be used within a WalletProvider');
+  }
+  return context;
+};
