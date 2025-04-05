@@ -1,0 +1,679 @@
+/* Header Component */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #1A1A1A;
+  border-bottom: 1px solid #333;
+}
+
+.header-logo h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.wallet-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wallet-address {
+  font-size: 14px;
+  color: #CCCCCC;
+  background-color: #333;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.wallet-disconnect {
+  background-color: transparent;
+  color: #FF6B6B;
+  border: 1px solid #FF6B6B;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.wallet-disconnect:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.connect-wallet-btn {
+  background-color: #FFFFFF;
+  color: #000000;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.connect-wallet-btn:hover {
+  background-color: #E0E0E0;
+}
+
+/* Connect Wallet Component */
+.wallet-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.wallet-modal {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  color: #000000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.wallet-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wallet-modal-tabs {
+  display: flex;
+  flex: 1;
+}
+
+.wallet-modal-tab {
+  padding: 16px 24px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #666666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.wallet-modal-tab.active {
+  color: #000000;
+  border-bottom: 2px solid #6FBCF0;
+}
+
+.wallet-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px 16px;
+  color: #666666;
+}
+
+.wallet-modal-content {
+  padding: 24px;
+}
+
+.wallet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wallet-option {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #F5F5F5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 500;
+}
+
+.wallet-option:hover {
+  background-color: #E0E0E0;
+}
+
+.wallet-logo {
+  width: 32px;
+  height: 32px;
+  margin-right: 16px;
+}
+
+.wallet-info {
+  padding: 0 24px;
+}
+
+.wallet-info h3 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.wallet-info p {
+  color: #666666;
+  margin-bottom: 16px;
+}
+
+.wallet-info-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #E0E0E0;
+  font-size: 14px;
+  color: #666666;
+}
+
+.wallet-error {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #FFEBEE;
+  color: #D32F2F;
+  border-radius: 4px;
+}
+
+.wallet-connecting {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #E3F2FD;
+  color: #1976D2;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Content Upload Component */
+.content-upload {
+  margin-bottom: 32px;
+}
+
+.content-upload h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.file-drop-area {
+  border: 2px dashed #AAAAAA;
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+
+.file-drop-area:hover {
+  border-color: #6FBCF0;
+}
+
+.file-drop-message {
+  color: #AAAAAA;
+}
+
+.file-drop-note {
+  font-size: 12px;
+  margin-top: 8px;
+  color: #888888;
+}
+
+.file-preview {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #444;
+  background-color: #222;
+  color: #FFFFFF;
+  border-radius: 4px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.upload-button {
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.upload-button:hover {
+  background-color: #5EAEE0;
+}
+
+.upload-button:disabled {
+  background-color: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.upload-success {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #E8F5E9;
+  color: #388E3C;
+  border-radius: 4px;
+}
+
+.upload-error {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #FFEBEE;
+  color: #D32F2F;
+  border-radius: 4px;
+}
+
+/* Allowlist Manager Component */
+.allowlist-manager {
+  margin-bottom: 32px;
+}
+
+.allowlist-manager h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.allowlist-create,
+.allowlist-manage {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.allowlist-create h3,
+.allowlist-manage h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.create-button {
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.create-button:hover {
+  background-color: #5EAEE0;
+}
+
+.create-button:disabled {
+  background-color: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.allowlist-info {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.allowlist-info h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.allowlist-members {
+  margin-bottom: 16px;
+}
+
+.allowlist-members h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.allowlist-members ul {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 12px;
+  list-style-type: none;
+}
+
+.allowlist-members li {
+  padding: 8px 0;
+  border-bottom: 1px solid #444;
+}
+
+.allowlist-members li:last-child {
+  border-bottom: none;
+}
+
+.allowlist-add,
+.allowlist-remove {
+  margin-bottom: 16px;
+}
+
+.allowlist-add h4,
+.allowlist-remove h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.address-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.address-input-group input {
+  flex: 1;
+}
+
+.address-input-group button {
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.addresses-to-add {
+  margin-top: 16px;
+}
+
+.addresses-to-add h5 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.addresses-to-add ul {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 16px;
+  list-style-type: none;
+}
+
+.addresses-to-add li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #444;
+}
+
+.addresses-to-add li:last-child {
+  border-bottom: none;
+}
+
+.remove-button {
+  background-color: transparent;
+  color: #FF6B6B;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.remove-button:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.add-to-allowlist-button {
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.operation-success {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #E8F5E9;
+  color: #388E3C;
+  border-radius: 4px;
+}
+
+.operation-error {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #FFEBEE;
+  color: #D32F2F;
+  border-radius: 4px;
+}
+
+/* Subscription Manager Component */
+.subscription-manager {
+  margin-bottom: 32px;
+}
+
+.subscription-manager h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.subscription-create,
+.subscription-purchase,
+.subscription-active {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.subscription-create h3,
+.subscription-purchase h3,
+.subscription-active h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.service-info {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 16px;
+}
+
+.service-info h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.purchase-button {
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-top: 16px;
+}
+
+.purchase-button:hover {
+  background-color: #5EAEE0;
+}
+
+.purchase-button:disabled {
+  background-color: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.subscriptions-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.subscription-item {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.subscription-item:last-child {
+  margin-bottom: 0;
+}
+
+.subscription-details h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Content Viewer Component */
+.content-viewer {
+  margin-bottom: 32px;
+}
+
+.content-viewer h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.content-select {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.content-select .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.decrypt-button {
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  height: 42px;
+}
+
+.decrypt-button:hover {
+  background-color: #5EAEE0;
+}
+
+.decrypt-button:disabled {
+  background-color: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.content-info {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.content-info h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.content-display {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.content-display h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.image-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background-color: #333;
+  border-radius: 4px;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 4px;
+}
+
+.file-download {
+  padding: 16px;
+  background-color: #333;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.download-link {
+  display: inline-block;
+  margin-top: 12px;
+  background-color: #6FBCF0;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.download-link:hover {
+  background-color: #5EAEE0;
+  text-decoration: none;
+}
+
+.decryption-error {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #FFEBEE;
+  color: #D32F2F;
+  border-radius: 4px;
+}
+
+.no-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #AAAAAA;
+}

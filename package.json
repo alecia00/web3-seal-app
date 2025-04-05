@@ -1,0 +1,39 @@
+{
+  "name": "web3-seal-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@mysten/sui.js": "^0.44.0",
+    "@mysten/wallet-kit": "^0.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "crypto-js": "^4.1.1"
+  },
+  "scripts": {
+    "dev": "react-scripts start",
+    "build": "node scripts/build.js",
+    "test": "node scripts/test.js",
+    "deploy:contracts": "node scripts/deploy.js",
+    "verify:contracts": "node scripts/verify.js",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
