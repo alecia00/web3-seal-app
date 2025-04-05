@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useWalletContext } from '../contexts/WalletContext';
 
 const Header = () => {
-  const { isConnected, wallet, connectWallet, disconnectWallet } = useWalletContext();
+  const { isConnected, address, isLoading, connectWallet, disconnectWallet } = useWalletContext();
+  const location = useLocation();
 
   return (
     <header className="app-header">
@@ -11,16 +12,16 @@ const Header = () => {
         <div className="header-content">
           <div className="logo">
             <Link to="/">
-              <h1>Seal Protocol</h1>
+              <h1>Sui Seal Protocol</h1>
             </Link>
           </div>
           
           <nav className="main-nav">
             <ul>
-              <li>
+              <li className={location.pathname === '/allowlist' ? 'active' : ''}>
                 <Link to="/allowlist">Allowlist</Link>
               </li>
-              <li>
+              <li className={location.pathname === '/subscription' ? 'active' : ''}>
                 <Link to="/subscription">Subscription</Link>
               </li>
               <li>
@@ -40,7 +41,7 @@ const Header = () => {
             {isConnected ? (
               <div className="wallet-info">
                 <span className="wallet-address">
-                  {wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
                 </span>
                 <button 
                   className="btn disconnect"
@@ -53,8 +54,9 @@ const Header = () => {
               <button 
                 className="btn connect"
                 onClick={connectWallet}
+                disabled={isLoading}
               >
-                Connect Wallet
+                {isLoading ? 'Connecting...' : 'Connect Wallet'}
               </button>
             )}
           </div>
