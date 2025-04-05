@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useWalletContext } from '../contexts/WalletContext';
+import ConnectWallet from './ConnectWallet';
 
 const AllowlistManager = () => {
-  const { connected, connectWallet } = useWalletContext();
+  const { connected } = useWalletContext();
   
   const [viewMode, setViewMode] = useState('create');
   const [allowlistName, setAllowlistName] = useState('');
@@ -11,6 +12,7 @@ const AllowlistManager = () => {
   const [newMemberAddress, setNewMemberAddress] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showWalletModal, setShowWalletModal] = useState(false);
 
   // Load mock data when connected
   useEffect(() => {
@@ -124,6 +126,10 @@ const AllowlistManager = () => {
     setSelectedAllowlist(allowlist);
   };
 
+  const handleConnectWallet = () => {
+    setShowWalletModal(true);
+  };
+
   if (!connected) {
     return (
       <div className="allowlist-manager">
@@ -132,10 +138,14 @@ const AllowlistManager = () => {
           <p>Connect your wallet to manage your allowlists on Sui Testnet.</p>
           <button 
             className="btn primary"
-            onClick={connectWallet}
+            onClick={handleConnectWallet}
           >
             Connect Wallet
           </button>
+          
+          {showWalletModal && (
+            <ConnectWallet onClose={() => setShowWalletModal(false)} />
+          )}
         </div>
       </div>
     );
