@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useWalletContext } from '../contexts/WalletContext';
+import ConnectWallet from './ConnectWallet';
 
 const Header = () => {
-  const { connected, address, isLoading, connectWallet, disconnectWallet } = useWalletContext();
   const location = useLocation();
+  const { connected, address, connectWallet, disconnectWallet } = useWalletContext();
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  
+  // Format address for display
+  const formatAddress = (addr) => {
+    if (!addr) return '';
+    return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
+  };
+
+  // Handle wallet connect button click
+  const handleConnectClick = () => {
+    if (!connected) {
+      setShowWalletModal(true);
+    }
+  };
+
+  // Handle wallet disconnect
+  const handleDisconnect = async () => {
+    await disconnectWallet();
+  };
 
   return (
     <header className="app-header">
@@ -18,10 +38,13 @@ const Header = () => {
           
           <nav className="main-nav">
             <ul>
-              <li className={location.pathname === '/allowlist' ? 'active' : ''}>
+              <li className={location.pathname === "/" ? "active" : ""}>
+                <Link to="/">Home</Link>
+              </li>
+              <li className={location.pathname === "/allowlist" ? "active" : ""}>
                 <Link to="/allowlist">Allowlist</Link>
               </li>
-              <li className={location.pathname === '/subscription' ? 'active' : ''}>
+              <li className={location.pathname === "/subscription" ? "active" : ""}>
                 <Link to="/subscription">Subscription</Link>
               </li>
               <li>
@@ -40,12 +63,10 @@ const Header = () => {
           <div className="wallet-section">
             {connected ? (
               <div className="wallet-info">
-                <span className="wallet-address">
-                  {address.slice(0, 6)}...{address.slice(-4)}
-                </span>
+                <span className="wallet-address">{formatAddress(address)}</span>
                 <button 
                   className="btn disconnect"
-                  onClick={disconnectWallet}
+                  onClick={handleDisconnect}
                 >
                   Disconnect
                 </button>
@@ -53,15 +74,18 @@ const Header = () => {
             ) : (
               <button 
                 className="btn connect"
-                onClick={connectWallet}
-                disabled={isLoading}
+                onClick={handleConnectClick}
               >
-                {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                Connect Wallet
               </button>
             )}
           </div>
         </div>
       </div>
+      
+      {showWalletModal && (
+        <ConnectWallet onClose={() => setShowWalletModal(false)} />
+      )}
     </header>
   );
 };
