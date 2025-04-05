@@ -231,28 +231,6 @@ export const WalletProvider = ({ children }) => {
     }
   };
   
-  // Value to be provided by the context
-  const value = {
-    WALLET_TYPES,
-    walletAddress,
-    currentWallet,
-    isConnecting,
-    isConnected,
-    error,
-    network,
-    connectWallet,
-    disconnectWallet,
-    signMessage,
-    executeTransaction,
-  };
-  
-  return (
-    <WalletContext.Provider value={value}>
-      {children}
-    </WalletContext.Provider>
-  );
-};
-  
   // Execute transaction
   const executeTransaction = async (transaction) => {
     try {
@@ -298,3 +276,25 @@ export const WalletProvider = ({ children }) => {
       throw err;
     }
   };
+  
+  // Value to be provided by the context
+  const value = {
+    WALLET_TYPES,
+    walletAddress,
+    currentWallet,
+    isConnecting,
+    isConnected,
+    error,
+    network,
+    connectWallet,
+    disconnectWallet,
+    signMessage,
+    executeTransaction,
+  };
+  
+  return (
+    <WalletContext.Provider value={value}>
+      {children}
+    </WalletContext.Provider>
+  );
+};
