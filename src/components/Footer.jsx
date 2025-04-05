@@ -6,19 +6,24 @@ const Footer = () => {
       <div className="container">
         <div className="footer-content">
           <div className="footer-info">
-            <p>Built on Sui Testnet</p>
+            <p>Sui Seal Protocol - Running on Sui Testnet</p>
           </div>
-          
-          <div className="creator-info">
+          <div className="footer-links">
+            <a href="https://docs.sui.io/" target="_blank" rel="noopener noreferrer">
+              Sui Docs
+            </a>
+            <span className="footer-divider">|</span>
+            <a href="https://faucet.sui.io/" target="_blank" rel="noopener noreferrer">
+              Faucet
+            </a>
+            <span className="footer-divider">|</span>
+            <a href="https://explorer.sui.io/" target="_blank" rel="noopener noreferrer">
+              Explorer
+            </a>
+          </div>
+          <div className="footer-credits">
             <p>
-              Created by <a 
-                href="https://t.me/extrajossbos" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="creator-link"
-              >
-                techzs
-              </a>
+              Built by <span className="creator-link">techzs</span>
             </p>
           </div>
         </div>
