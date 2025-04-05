@@ -1,48 +1,55 @@
 import React, { useState } from 'react';
 import { useWalletContext } from '../contexts/WalletContext';
+import ConnectWallet from './ConnectWallet';
 
 const SubscriptionManager = () => {
-  const { connected, connectWallet, isLoading: walletLoading } = useWalletContext();
-  const [loading, setLoading] = useState(false);
+  const { connected } = useWalletContext();
+  const [showWalletModal, setShowWalletModal] = useState(false);
   const [subscriptionName, setSubscriptionName] = useState('');
   const [subscriptionFee, setSubscriptionFee] = useState('');
-  const [subscriptionDuration, setSubscriptionDuration] = useState('30');
+  const [durationDays, setDurationDays] = useState('30');
+  const [isLoading, setIsLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
+
+  const handleConnectWallet = () => {
+    setShowWalletModal(true);
+  };
 
   const handleCreateSubscription = (e) => {
     e.preventDefault();
-    if (!subscriptionName || !subscriptionFee) return;
+    if (!subscriptionName.trim() || !subscriptionFee.trim()) return;
     
-    setLoading(true);
+    setIsLoading(true);
     
-    // Simulate API call
+    // Simulate blockchain transaction
     setTimeout(() => {
-      setActionMessage(`Subscription "${subscriptionName}" created successfully!`);
+      setActionMessage('Subscription plan created successfully!');
       setSubscriptionName('');
       setSubscriptionFee('');
-      setSubscriptionDuration('30');
-      setLoading(false);
+      setDurationDays('30');
+      setIsLoading(false);
       
       // Clear message after 3 seconds
-      setTimeout(() => {
-        setActionMessage('');
-      }, 3000);
+      setTimeout(() => setActionMessage(''), 3000);
     }, 1500);
   };
-  
+
   if (!connected) {
     return (
       <div className="subscription-manager">
         <div className="card">
           <h2>Subscription Manager</h2>
-          <p>Connect your wallet to manage subscriptions on Sui Testnet.</p>
+          <p>Connect your wallet to create and manage subscription plans on Sui Testnet.</p>
           <button 
             className="btn primary"
-            onClick={connectWallet}
-            disabled={walletLoading}
+            onClick={handleConnectWallet}
           >
-            {walletLoading ? 'Connecting...' : 'Connect Wallet'}
+            Connect Wallet
           </button>
+          
+          {showWalletModal && (
+            <ConnectWallet onClose={() => setShowWalletModal(false)} />
+          )}
         </div>
       </div>
     );
@@ -51,79 +58,78 @@ const SubscriptionManager = () => {
   return (
     <div className="subscription-manager">
       <div className="card">
-        <h2>Subscription Manager</h2>
-        <p>
-          Create and manage subscription-based access to your content. 
-          Set subscription fees and durations to monetize your content with NFT subscriptions.
-        </p>
+        <h2>Create Subscription Plan</h2>
         
         {actionMessage && (
-          <div className="action-message success">
+          <div className={`action-message ${actionMessage.includes('Error') ? 'error' : 'success'}`}>
             {actionMessage}
           </div>
         )}
         
         <div className="subscription-form">
-          <h3>Create New Subscription</h3>
           <form onSubmit={handleCreateSubscription}>
             <div className="form-group">
-              <label htmlFor="subscriptionName">Subscription Name</label>
+              <label htmlFor="subscription-name">Subscription Name</label>
               <input
-                id="subscriptionName"
+                id="subscription-name"
                 type="text"
                 value={subscriptionName}
                 onChange={(e) => setSubscriptionName(e.target.value)}
-                placeholder="Premium Content Access"
+                placeholder="Enter subscription plan name"
                 className="input-field"
                 required
-                disabled={loading}
+                disabled={isLoading}
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="subscriptionFee">Subscription Fee (SUI)</label>
+              <label htmlFor="subscription-fee">Subscription Fee (SUI)</label>
               <input
-                id="subscriptionFee"
+                id="subscription-fee"
                 type="number"
-                min="0.001"
-                step="0.001"
+                step="0.01"
+                min="0"
                 value={subscriptionFee}
                 onChange={(e) => setSubscriptionFee(e.target.value)}
-                placeholder="0.1"
+                placeholder="Enter fee amount in SUI"
                 className="input-field"
                 required
-                disabled={loading}
+                disabled={isLoading}
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="subscriptionDuration">Duration (days)</label>
+              <label htmlFor="duration">Duration (Days)</label>
               <select
-                id="subscriptionDuration"
-                value={subscriptionDuration}
-                onChange={(e) => setSubscriptionDuration(e.target.value)}
+                id="duration"
+                value={durationDays}
+                onChange={(e) => setDurationDays(e.target.value)}
                 className="input-field"
-                required
-                disabled={loading}
+                disabled={isLoading}
               >
                 <option value="7">7 days</option>
                 <option value="30">30 days</option>
                 <option value="90">90 days</option>
+                <option value="180">180 days</option>
                 <option value="365">365 days</option>
               </select>
             </div>
             
             <button 
               type="submit" 
-              className="btn primary" 
-              disabled={loading || !subscriptionName || !subscriptionFee}
+              className="btn primary"
+              disabled={isLoading || !subscriptionName.trim() || !subscriptionFee.trim()}
             >
-              {loading ? 'Creating...' : 'Create Subscription'}
+              {isLoading ? 'Creating...' : 'Create Subscription Plan'}
             </button>
           </form>
           
           <div className="coming-soon-notice">
-            <p><strong>Note:</strong> This feature is currently under development. Full subscription functionality will be available soon.</p>
+            <h3>Coming Soon</h3>
+            <p>
+              Soon you'll be able to view all your subscription plans, manage subscribers,
+              and track revenue directly from this dashboard. Stay tuned for updates!
+            </p>
           </div>
         </div>
       </div>
