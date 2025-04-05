@@ -1,267 +1,84 @@
-/**
- * Sui blockchain interaction service
- * 
- * This file contains functions for interacting with the Sui blockchain.
- * In a production app, these would use the Sui SDK to create and send 
- * transactions to the blockchain.
- * 
- * For this demo, we'll create simplified versions that primarily use
- * localStorage to simulate blockchain interactions.
- */
+import { JsonRpcProvider, Connection } from '@mysten/sui.js';
 
-/**
- * Creates a new allowlist on the blockchain
- * 
- * @param {string} name - Name of the allowlist
- * @param {string} creator - Creator's wallet address
- * @param {Function} executeTransaction - Function to execute a transaction
- * @returns {Promise<string>} ID of the created allowlist
- */
-export const createAllowlist = async (name, creator, executeTransaction) => {
-  try {
-    // In a real implementation, this would create a Move transaction
-    // For demo purposes, we'll use localStorage
-    
-    // Create allowlist object
-    const allowlistId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const allowlist = {
-      id: allowlistId,
-      name,
-      members: [creator], // Start with just the creator
-      creator,
-      createdAt: Date.now(),
-    };
-    
-    // Get existing allowlists
-    const allowlistsString = localStorage.getItem(`seal_allowlists_${creator}`);
-    const allowlists = allowlistsString ? JSON.parse(allowlistsString) : [];
-    
-    // Add new allowlist
-    allowlists.push(allowlist);
-    
-    // Save allowlists
-    localStorage.setItem(`seal_allowlists_${creator}`, JSON.stringify(allowlists));
-    
-    return allowlistId;
-  } catch (error) {
-    console.error('Error creating allowlist:', error);
-    throw new Error('Failed to create allowlist');
+const TESTNET_URL = 'https://fullnode.testnet.sui.io/';
+const provider = new JsonRpcProvider(new Connection({
+  fullnode: TESTNET_URL,
+}));
+
+const suiService = {
+  // Get connected wallet account
+  getAccount: async (wallet) => {
+    if (!wallet.connected) throw new Error('Wallet not connected');
+    return wallet.account;
+  },
+
+  // Create an allowlist entry
+  createAllowlist: async (wallet, name) => {
+    try {
+      if (!wallet.connected) throw new Error('Wallet not connected');
+      
+      // In a real implementation, you would:
+      // 1. Build a transaction to call your allowlist contract
+      // 2. Sign it with the wallet
+      // 3. Execute the transaction
+      // 4. Return the transaction results
+      
+      // For now, we're mocking the response
+      console.log(`Creating allowlist: ${name}`);
+      
+      // This would be where you would interact with your smart contract
+      return {
+        success: true,
+        transactionId: `mock-tx-${Date.now()}`,
+        allowlistId: `allowlist-${Date.now()}`
+      };
+    } catch (error) {
+      console.error('Error creating allowlist:', error);
+      throw error;
+    }
+  },
+
+  // Get all allowlists for a user
+  getAllowlists: async (wallet) => {
+    try {
+      if (!wallet.connected) throw new Error('Wallet not connected');
+
+      // In a real implementation, you would query your smart contract
+      // For now, return mock data
+      return [
+        {
+          id: 'allowlist-1',
+          name: 'Premium Content',
+          members: ['0x123', '0x456']
+        },
+        {
+          id: 'allowlist-2',
+          name: 'VIP Access',
+          members: ['0x789']
+        }
+      ];
+    } catch (error) {
+      console.error('Error fetching allowlists:', error);
+      throw error;
+    }
+  },
+
+  // Add member to allowlist
+  addMemberToAllowlist: async (wallet, allowlistId, memberAddress) => {
+    try {
+      if (!wallet.connected) throw new Error('Wallet not connected');
+
+      // Mock implementation
+      console.log(`Adding ${memberAddress} to allowlist ${allowlistId}`);
+      return {
+        success: true,
+        transactionId: `mock-tx-${Date.now()}`
+      };
+    } catch (error) {
+      console.error('Error adding member to allowlist:', error);
+      throw error;
+    }
   }
 };
 
-/**
- * Adds members to an allowlist
- * 
- * @param {string} allowlistId - ID of the allowlist
- * @param {Array<string>} members - Array of wallet addresses to add
- * @param {Function} executeTransaction - Function to execute a transaction
- * @returns {Promise<boolean>} Success status
- */
-export const addToAllowlist = async (allowlistId, members, executeTransaction) => {
-  try {
-    // In a real implementation, this would create a Move transaction
-    // For demo purposes, we'll use localStorage
-    
-    // Get current user's wallet address from localStorage (simulating transaction context)
-    const currentUser = localStorage.getItem('current_wallet_address');
-    if (!currentUser) {
-      throw new Error('No wallet connected');
-    }
-    
-    // Get allowlists
-    const allowlistsString = localStorage.getItem(`seal_allowlists_${currentUser}`);
-    if (!allowlistsString) {
-      throw new Error('No allowlists found');
-    }
-    
-    const allowlists = JSON.parse(allowlistsString);
-    
-    // Find the allowlist
-    const allowlistIndex = allowlists.findIndex(a => a.id === allowlistId);
-    if (allowlistIndex === -1) {
-      throw new Error('Allowlist not found');
-    }
-    
-    // Check if user is creator
-    if (allowlists[allowlistIndex].creator !== currentUser) {
-      throw new Error('Only the creator can modify the allowlist');
-    }
-    
-    // Update members (avoid duplicates)
-    const existingMembers = new Set(allowlists[allowlistIndex].members);
-    members.forEach(member => existingMembers.add(member));
-    
-    allowlists[allowlistIndex].members = Array.from(existingMembers);
-    
-    // Save allowlists
-    localStorage.setItem(`seal_allowlists_${currentUser}`, JSON.stringify(allowlists));
-    
-    return true;
-  } catch (error) {
-    console.error('Error adding to allowlist:', error);
-    throw new Error('Failed to add to allowlist');
-  }
-};
-
-/**
- * Removes members from an allowlist
- * 
- * @param {string} allowlistId - ID of the allowlist
- * @param {Array<string>} members - Array of wallet addresses to remove
- * @param {Function} executeTransaction - Function to execute a transaction
- * @returns {Promise<boolean>} Success status
- */
-export const removeFromAllowlist = async (allowlistId, members, executeTransaction) => {
-  try {
-    // In a real implementation, this would create a Move transaction
-    // For demo purposes, we'll use localStorage
-    
-    // Get current user's wallet address from localStorage (simulating transaction context)
-    const currentUser = localStorage.getItem('current_wallet_address');
-    if (!currentUser) {
-      throw new Error('No wallet connected');
-    }
-    
-    // Get allowlists
-    const allowlistsString = localStorage.getItem(`seal_allowlists_${currentUser}`);
-    if (!allowlistsString) {
-      throw new Error('No allowlists found');
-    }
-    
-    const allowlists = JSON.parse(allowlistsString);
-    
-    // Find the allowlist
-    const allowlistIndex = allowlists.findIndex(a => a.id === allowlistId);
-    if (allowlistIndex === -1) {
-      throw new Error('Allowlist not found');
-    }
-    
-    // Check if user is creator
-    if (allowlists[allowlistIndex].creator !== currentUser) {
-      throw new Error('Only the creator can modify the allowlist');
-    }
-    
-    // Creator cannot remove themselves
-    const membersToRemove = members.filter(m => m !== currentUser);
-    
-    // Update members
-    allowlists[allowlistIndex].members = allowlists[allowlistIndex].members.filter(
-      m => !membersToRemove.includes(m)
-    );
-    
-    // Save allowlists
-    localStorage.setItem(`seal_allowlists_${currentUser}`, JSON.stringify(allowlists));
-    
-    return true;
-  } catch (error) {
-    console.error('Error removing from allowlist:', error);
-    throw new Error('Failed to remove from allowlist');
-  }
-};
-
-/**
- * Creates a subscription service
- * 
- * @param {string} name - Name of the service
- * @param {number} price - Price in MIST
- * @param {number} duration - Duration in minutes
- * @param {string} creator - Creator's wallet address
- * @param {Function} executeTransaction - Function to execute a transaction
- * @returns {Promise<string>} ID of the created service
- */
-export const createSubscriptionService = async (
-  name, 
-  price, 
-  duration, 
-  creator, 
-  executeTransaction
-) => {
-  try {
-    // In a real implementation, this would create a Move transaction
-    // For demo purposes, we'll use localStorage
-    
-    // Create service object
-    const serviceId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const service = {
-      id: serviceId,
-      name,
-      price,
-      duration,
-      creator,
-      createdAt: Date.now(),
-    };
-    
-    // Get existing services
-    const servicesString = localStorage.getItem(`seal_services_${creator}`);
-    const services = servicesString ? JSON.parse(servicesString) : [];
-    
-    // Add new service
-    services.push(service);
-    
-    // Save services
-    localStorage.setItem(`seal_services_${creator}`, JSON.stringify(services));
-    
-    return serviceId;
-  } catch (error) {
-    console.error('Error creating subscription service:', error);
-    throw new Error('Failed to create subscription service');
-  }
-};
-
-/**
- * Purchases a subscription
- * 
- * @param {string} serviceId - ID of the service
- * @param {string} buyer - Buyer's wallet address
- * @param {Function} executeTransaction - Function to execute a transaction
- * @returns {Promise<string>} ID of the created subscription
- */
-export const purchaseSubscription = async (serviceId, buyer, executeTransaction) => {
-  try {
-    // In a real implementation, this would create a Move transaction
-    // For demo purposes, we'll use localStorage
-    
-    // Get service
-    const services = [];
-    
-    // Collect all services from all users (in a real app, this would be a blockchain query)
-    const allKeys = Object.keys(localStorage);
-    const serviceKeys = allKeys.filter(key => key.startsWith('seal_services_'));
-    
-    for (const key of serviceKeys) {
-      const userServices = JSON.parse(localStorage.getItem(key) || '[]');
-      services.push(...userServices);
-    }
-    
-    // Find the service
-    const service = services.find(s => s.id === serviceId);
-    if (!service) {
-      throw new Error('Service not found');
-    }
-    
-    // Create subscription object
-    const subscriptionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const subscription = {
-      id: subscriptionId,
-      serviceId,
-      user: buyer,
-      purchasedAt: Date.now(),
-      expiresAt: Date.now() + (service.duration * 60 * 1000), // Convert minutes to ms
-    };
-    
-    // Get existing subscriptions
-    const subscriptionsString = localStorage.getItem(`seal_subscriptions_${buyer}`);
-    const subscriptions = subscriptionsString ? JSON.parse(subscriptionsString) : [];
-    
-    // Add new subscription
-    subscriptions.push(subscription);
-    
-    // Save subscriptions
-    localStorage.setItem(`seal_subscriptions_${buyer}`, JSON.stringify(subscriptions));
-    
-    return subscriptionId;
-  } catch (error) {
-    console.error('Error purchasing subscription:', error);
-    throw new Error('Failed to purchase subscription');
-  }
-};
+export default suiService;
