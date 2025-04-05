@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useWalletContext } from '../contexts/WalletContext';
 
 const ConnectWallet = ({ onClose }) => {
-  const { WALLET_TYPES, connectWallet, isLoading, getWalletOptions } = useWalletContext();
+  const { 
+    connectWallet, 
+    isLoading, 
+    getWalletOptions,
+    WALLET_TYPES
+  } = useWalletContext();
   const [activeTab, setActiveTab] = useState('connect'); // 'connect' or 'info'
   const [error, setError] = useState('');
   const [walletOptions, setWalletOptions] = useState([]);
   
   useEffect(() => {
-    // Get available wallet options
+    // Get available wallet options when component mounts
     setWalletOptions(getWalletOptions());
   }, [getWalletOptions]);
 
@@ -24,8 +29,34 @@ const ConnectWallet = ({ onClose }) => {
     }
   };
 
+  // Dynamic wallet list instead of hardcoded options
+  const renderWalletOptions = () => {
+    if (!walletOptions.length) {
+      return <div className="wallet-empty">No wallets detected. Please install a Sui wallet.</div>;
+    }
+
+    return walletOptions.map((wallet) => (
+      <button
+        key={wallet.id}
+        className="wallet-option"
+        onClick={() => handleWalletSelect(wallet.type)}
+        disabled={isLoading}
+      >
+        <img 
+          src={wallet.icon} 
+          alt={`${wallet.name} logo`} 
+          className="wallet-logo"
+        />
+        <span>{wallet.name}</span>
+      </button>
+    ));
+  };
+
   return (
-    <div className="wallet-modal-overlay">
+    <div className="wallet-modal-overlay" onClick={(e) => {
+      // Close when clicking the overlay but not the modal itself
+      if (e.target === e.currentTarget) onClose();
+    }}>
       <div className="wallet-modal">
         <div className="wallet-modal-header">
           <div className="wallet-modal-tabs">
@@ -42,7 +73,7 @@ const ConnectWallet = ({ onClose }) => {
               What is a Wallet
             </button>
           </div>
-          <button className="wallet-modal-close" onClick={onClose}>
+          <button className="wallet-modal-close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
@@ -50,57 +81,7 @@ const ConnectWallet = ({ onClose }) => {
         <div className="wallet-modal-content">
           {activeTab === 'connect' && (
             <div className="wallet-list">
-              <button
-                className="wallet-option"
-                onClick={() => handleWalletSelect(WALLET_TYPES.SUI)}
-                disabled={isLoading}
-              >
-                <img 
-                  src="/assets/sui-wallet-logo.svg" 
-                  alt="Sui Wallet" 
-                  className="wallet-logo"
-                />
-                <span>Sui Wallet</span>
-              </button>
-
-              <button
-                className="wallet-option"
-                onClick={() => handleWalletSelect(WALLET_TYPES.PHANTOM)}
-                disabled={isLoading}
-              >
-                <img 
-                  src="/assets/phantom-logo.svg" 
-                  alt="Phantom" 
-                  className="wallet-logo"
-                />
-                <span>Phantom</span>
-              </button>
-
-              <button
-                className="wallet-option"
-                onClick={() => handleWalletSelect(WALLET_TYPES.MARTIAN)}
-                disabled={isLoading}
-              >
-                <img 
-                  src="/assets/martian-logo.svg" 
-                  alt="Martian Sui Wallet" 
-                  className="wallet-logo"
-                />
-                <span>Martian Sui Wallet</span>
-              </button>
-
-              <button
-                className="wallet-option"
-                onClick={() => handleWalletSelect(WALLET_TYPES.OKX)}
-                disabled={isLoading}
-              >
-                <img 
-                  src="/assets/okx-logo.svg" 
-                  alt="OKX Wallet" 
-                  className="wallet-logo"
-                />
-                <span>OKX Wallet</span>
-              </button>
+              {renderWalletOptions()}
             </div>
           )}
 
@@ -117,6 +98,12 @@ const ConnectWallet = ({ onClose }) => {
               <p>
                 Send, receive, store, and display your digital assets
                 like NFTs & coins.
+              </p>
+              
+              <h3>Manage Your Web3 Identity</h3>
+              <p>
+                Your wallet serves as your identity in the decentralized web,
+                allowing you to interact with dApps securely.
               </p>
               
               <div className="wallet-info-footer">
@@ -143,6 +130,7 @@ const ConnectWallet = ({ onClose }) => {
 
           {isLoading && (
             <div className="wallet-connecting">
+              <span className="wallet-connecting-spinner"></span>
               Connecting to wallet...
             </div>
           )}
